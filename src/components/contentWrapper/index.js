@@ -77,17 +77,29 @@ class ContentWrapper extends Component {
     planetSelected = (val, uid) => {
         const tempState = JSON.parse(JSON.stringify(this.state));
         let foundFlag = false;
+        let planetId = '';
+        let planetDist = '';
         tempState.selectedPlanet = [];
+
+        for (const planetInx in tempState.planetList) {
+            if (tempState.planetList[planetInx].name === val) {
+                planetId = tempState.planetList[planetInx].id;
+                planetDist = tempState.planetList[planetInx].distance;
+            }
+        }
         for (const planetInx in tempState.selectedPlanetsList) {
-            if (parseInt(tempState.selectedPlanetsList[planetInx].uid) === parseInt(uid)) {
-                tempState.selectedPlanetsList[planetInx].planet = val;
+            const singleObj = tempState.selectedPlanetsList[planetInx];
+            if (parseInt(singleObj.uid) === parseInt(uid)) {
+                singleObj.planet = val;
+                singleObj.id = planetId;
+                singleObj.planetDist = planetDist;
                 foundFlag = true;
             }
             tempState.selectedPlanet.push(tempState.selectedPlanetsList[planetInx].planet);
         }
 
         if (!foundFlag) {
-            tempState.selectedPlanetsList.push({ planet: val, uid: uid })
+            tempState.selectedPlanetsList.push({ planet: val, uid: uid, planetId, planetDist })
             tempState.selectedPlanet.push(val);
         }
         // tempState.selectedPlanet.push(val);
@@ -95,7 +107,7 @@ class ContentWrapper extends Component {
             selectedPlanetsList: tempState.selectedPlanetsList,
             selectedPlanet: tempState.selectedPlanet
         }, () => {
-            console.log('this.state.selectedPlanetsList', this.state.selectedPlanet);
+            console.log('this.state.selectedPlanetsList', this.state.selectedPlanetsList);
         });
     }
 

@@ -11,6 +11,14 @@ class ShipSelectionRow extends Component {
         };
     }
     render() {
+        let distConstant = '';
+        this.props.selectedPlanetsList.map((elm) => {
+            // debugger;
+            if (elm.uid === this.props.uid) {
+                distConstant = elm.planetDist;
+            }
+        })
+        console.log('distConstant', distConstant)
         return (
             <div className="ship-selection-wrapper col">
                 <div className="form-group">
@@ -23,13 +31,11 @@ class ShipSelectionRow extends Component {
                         <select value={this.state.selectedPlanet}
                             onChange={this.planetSelected}
                             className="custom-select">
-                            <option disabled
-                                value={this.state.selectedPlanet}>
-                                {this.state.selectedPlanet}</option>
+                            {/* <option disabled value={this.getName()}>{this.getName()}</option> */}
+                            <option disabled value={this.state.selectedPlanet}>{this.state.selectedPlanet}</option>
                             {this.props.planetList.map((elm) => {
                                 if (!this.props.selectedPlanet.includes(elm.name)) {
-                                    return (<option key={elm.id}
-                                        value={elm.name}>{elm.name}</option>);
+                                    return (<option key={elm.id} value={elm.name}>{`${elm.name}${elm.distance}`}</option>);
                                 } else {
                                     return null;
                                 }
@@ -46,9 +52,9 @@ class ShipSelectionRow extends Component {
                                         this.setState({ selectedShip: elm.name });
                                         this.props.shipSelected(e.target.value, elm, this.props.uid)
                                     }} name={this.props.uid} id={`${this.props.uid}${elm.name}`}
-                                        disabled={this.props.parsedShipList[elm.id] <= 0 ? true : false}
+                                        disabled={(distConstant > elm.max_distance) || (this.props.parsedShipList[elm.id] <= 0 ? true : false)}
                                         className="custom-control-input" />
-                                    <label className="custom-control-label" htmlFor={`${this.props.uid}${elm.name}`}>{`${elm.name} (${this.props.parsedShipList[elm.id]})`}</label>
+                                    <label className="custom-control-label" htmlFor={`${this.props.uid}${elm.name}`}>{`${elm.name} (${this.props.parsedShipList[elm.id]}) ${elm.max_distance}`}</label>
                                 </div>
                             </div>)
                     })}
@@ -56,6 +62,18 @@ class ShipSelectionRow extends Component {
             </div>
         );
     }
+
+    getName = () => {
+        let name = 'Select';
+        for (const planetInx in this.props.planetList) {
+            if (this.props.planetList[planetInx].name === this.state.selectedPlanet) {
+                name = this.props.planetList[planetInx].name + this.props.planetList[planetInx].distance;
+            }
+        }
+        // debugger;
+        return name;
+    }
+
     planetSelected = (e) => {
         this.setState({ selectedPlanet: e.target.value });
         this.props.planetSelected(e.target.value, this.props.uid)
