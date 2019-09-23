@@ -1,0 +1,12 @@
+.page-container {
+    display: flex;
+    flex: 1;
+
+    .selection-section {
+        display: flex;
+        flex-direction: row;
+        .ship-selection-wrapper:not(:last-child) {
+            margin-right: 1rem;
+        }
+    }
+}
