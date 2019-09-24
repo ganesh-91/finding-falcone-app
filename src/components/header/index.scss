@@ -1,0 +1,35 @@
+.App-header {
+
+    background-color: #282c34;
+    min-height: 70px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    color: white;
+
+    .brand-name {
+        font-size: calc(18px + 2vmin);
+        justify-content: center;
+    }
+
+    .links {
+        font-size: 14px;
+        justify-content: flex-end;
+
+        a {
+            color: white;
+
+            &:hover {
+                color: white;
+            }
+        }
+    }
+
+    div {
+        display: flex;
+        flex: 1;
+
+    }
+
+}

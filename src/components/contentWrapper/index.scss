@@ -9,10 +9,17 @@
         .selection-section {
             display: flex;
             flex-direction: row;
+            flex: 3;
 
             .ship-selection-wrapper:not(:last-child) {
                 margin-right: 1rem;
             }
+        }
+
+        .info-display {
+            display: flex;
+            flex: 1;
+            justify-content: center;
         }
     }
 

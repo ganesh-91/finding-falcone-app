@@ -28,7 +28,7 @@ class UserSelectionBlock extends Component {
                                     planetSelected={this.props.planetSelected} />)
                         })}
                     </div>
-                    <div>Time Taken : {this.props.timeCount}</div>
+                    <div className="info-display">Time Taken : {this.props.timeCount}</div>
                 </div>
                 <div>
                     <button onClick={this.props.findFalcon} type="button" className="btn btn-primary">Find Falcon</button>
