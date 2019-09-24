@@ -6,6 +6,62 @@ import ShipSelectionRow from "../shipSelectionRow";
 
 import './index.scss';
 
+class UserSelectionBlock extends Component {
+    render() {
+        return (
+            <>
+                <div>Select planet you want to search</div>
+                <div className="text-danger">{this.props.error}</div>
+                <div className="user-actions mt-5">
+                    <div className="selection-section">
+                        {this.props.selectedPlanetsList.map((elm) => {
+                            return (
+                                <ShipSelectionRow
+                                    uid={elm.uid}
+                                    key={elm.uid}
+                                    parsedShipList={this.props.parsedShipList}
+                                    selectedPlanet={this.props.selectedPlanet}
+                                    selectedPlanetsList={this.props.selectedPlanetsList}
+                                    shipList={this.props.shipList}
+                                    planetList={this.props.planetList}
+                                    shipSelected={this.props.shipSelected}
+                                    planetSelected={this.props.planetSelected} />)
+                        })}
+                    </div>
+                    <div>Time Taken : {this.props.timeCount}</div>
+                </div>
+                <div>
+                    <button onClick={this.props.findFalcon} type="button" className="btn btn-primary">Find Falcon</button>
+                </div>
+            </>
+        );
+    }
+}
+
+const ResultBlock = (props) => {
+    if (props.status === 'pass') {
+        return (
+            <div>
+                <h3>
+                    <p>Success! Congratulation on Finding Falcon. King Shan is Mighty pleased.</p>
+                    <p className="mt-5">Time Taken : {props.timeCount}</p>
+                    <p className="mt-2">Planet found : {props.planet_found}</p>
+                </h3>
+            </div>
+        )
+    } else if (props.status === 'fail') {
+        return (
+            <div>
+                <h3>
+                    <p>Sorry! Finding Falcon mission failed. Try again.</p>
+                    <p className="mt-5">Time Taken : {props.timeCount}</p>
+                </h3>
+            </div>
+        )
+    }
+
+}
+
 class ContentWrapper extends Component {
     constructor(props) {
         super(props);
@@ -18,39 +74,37 @@ class ContentWrapper extends Component {
                 { uid: 3 },
                 { uid: 4 }
             ],
-            selectedShips: [],
             selectedPlanet: [],
             parsedShipList: {},
-            timeCount: 0
+            timeCount: 0,
+            error: '',
+            success: false,
+            planet_found: ''
         };
     }
     render() {
         return (
             <div className="page-container container">
                 <div className="container-fluid mt-5">
-                    <div>Select planet you want to search</div>
-                    <div className="user-actions mt-5">
-                        <div className="selection-section">
-                            {this.state.selectedPlanetsList.map((elm) => {
-                                return (
-                                <ShipSelectionRow
-                                    uid={elm.uid}
-                                    key={elm.uid}
-                                    selectedShips={this.state.selectedShips}
-                                    parsedShipList={this.state.parsedShipList}
-                                    selectedPlanet={this.state.selectedPlanet}
-                                    shipSelected={this.shipSelected}
-                                    selectedPlanetsList={this.state.selectedPlanetsList}
-                                    planetSelected={this.planetSelected}
-                                    shipList={this.state.shipList}
-                                    planetList={this.state.planetList} />)
-                            })}
-                        </div>
-                        <div>Time Taken : {this.state.timeCount}</div>
-                    </div>
-                    <div>
-                        <button type="button" className="btn btn-primary">Find Falcon</button>
-                    </div>
+                    {this.state.success ?
+                        <ResultBlock
+                            status={this.state.status}
+                            timeCount={this.state.timeCount}
+                            planet_found={this.state.planet_found}
+                        />
+                        : <UserSelectionBlock
+                            parsedShipList={this.state.parsedShipList}
+                            selectedPlanet={this.state.selectedPlanet}
+                            selectedPlanetsList={this.state.selectedPlanetsList}
+                            shipList={this.state.shipList}
+                            planetList={this.state.planetList}
+                            error={this.state.error}
+                            shipSelected={this.shipSelected}
+                            planetSelected={this.planetSelected}
+                            timeCount={this.state.timeCount}
+                            findFalcon={this.findFalcon}
+                        />
+                    }
                 </div>
             </div>
         );
@@ -87,12 +141,10 @@ class ContentWrapper extends Component {
             tempState.selectedPlanetsList.push({ planet: val, uid: uid, planetId, planetDist })
             tempState.selectedPlanet.push(val);
         }
-        // tempState.selectedPlanet.push(val);
+
         this.setState({
             selectedPlanetsList: tempState.selectedPlanetsList,
             selectedPlanet: tempState.selectedPlanet
-        }, () => {
-            console.log('this.state.selectedPlanetsList', this.state.selectedPlanetsList);
         });
     }
 
@@ -130,8 +182,6 @@ class ContentWrapper extends Component {
             shipList: shipList,
             parsedShipList,
             timeCount
-        }, () => {
-            console.log('this.state.selectedPlanetsList', this.state.selectedPlanetsList);
         });
     }
 
@@ -151,21 +201,62 @@ class ContentWrapper extends Component {
             }
         }
 
-
         console.log('parsedShipList', parsedShipList);
         this.setState({
             planetList: response[0],
             shipList: response[1],
             parsedShipList
-        }, () => {
-            console.log('this.state.shipList', this.state.shipList)
         })
     }
 
-    toSingleRecipe = ((recipe) => {
-        this.props.updateSingleRecipe(recipe);
-        window.localStorage.setItem('singleRecipe', JSON.stringify(recipe));
-    })
+    getToken = () => {
+
+    }
+
+    findFalcon = async () => {
+        let token;
+
+        await API.postApi('token')
+            .then((resp) => {
+                token = resp.data.token;
+            })
+            .catch((error) => {
+                console.log(error);
+                this.setState({
+                    error: 'Error occurred !'
+                })
+            })
+        let rqstData = {
+            token,
+            planet_names: [],
+            vehicle_names: []
+        }
+        const tempList = JSON.parse(JSON.stringify(this.state.selectedPlanetsList));
+
+        for (const obj in tempList) {
+            if (tempList[obj].planet && tempList[obj].ship) {
+                rqstData.planet_names.push(tempList[obj].planet);
+                rqstData.vehicle_names.push(tempList[obj].ship);
+            }
+        }
+
+        API.postApi('find', rqstData)
+            .then((response) => {
+                this.setState({
+                    success: true,
+                    status: 'pass',
+                    planet_found: response.data.planet_name
+                })
+            })
+            .catch((error) => {
+                console.log(error);
+                this.setState({
+                    success: true,
+                    status: 'fail'
+                })
+
+            })
+    }
 
 }
 
