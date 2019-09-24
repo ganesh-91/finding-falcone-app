@@ -35,7 +35,7 @@ class ShipSelectionRow extends Component {
                             <option disabled value={this.state.selectedPlanet}>{this.state.selectedPlanet}</option>
                             {this.props.planetList.map((elm) => {
                                 if (!this.props.selectedPlanet.includes(elm.name)) {
-                                    return (<option key={elm.id} value={elm.name}>{`${elm.name}${elm.distance}`}</option>);
+                                    return (<option key={elm.id} value={elm.name}>{elm.name}</option>);
                                 } else {
                                     return null;
                                 }
@@ -54,7 +54,7 @@ class ShipSelectionRow extends Component {
                                     }} name={this.props.uid} id={`${this.props.uid}${elm.name}`}
                                         disabled={(distConstant > elm.max_distance) || (this.props.parsedShipList[elm.id] <= 0 ? true : false)}
                                         className="custom-control-input" />
-                                    <label className="custom-control-label" htmlFor={`${this.props.uid}${elm.name}`}>{`${elm.name} (${this.props.parsedShipList[elm.id]}) ${elm.max_distance}`}</label>
+                                    <label className="custom-control-label" htmlFor={`${this.props.uid}${elm.name}`}>{`${elm.name} (${this.props.parsedShipList[elm.id]})`}</label>
                                 </div>
                             </div>)
                     })}
